@@ -1,14 +1,21 @@
-const bcrypt = require('bcryptjs');
+const { Sequelize } = require('sequelize');
 
-const password = '123456789'; // La contraseña que deseas encriptar
-
-// Número de rondas de salt (cuanto mayor sea, más seguro pero más lento será el proceso)
-const saltRounds = 10;
-
-bcrypt.hash(password, saltRounds, (err, hash) => {
-  if (err) {
-    console.error('Error al encriptar la contraseña:', err);
-  } else {
-    console.log('Contraseña encriptada:', hash);
-  }
+// Crea una instancia de Sequelize con la información de conexión
+const sequelize = new Sequelize('railway', 'root', 'WIEJUkRxKnScrXNKOmZOXSiCZGuPCPqb', {
+    host: 'mysql.railway.internal', // Cambia esto si es necesario
+    port: 3306,
+    dialect: 'mysql',
 });
+
+// Prueba la conexión
+async function testConnection() {
+    try {
+        await sequelize.authenticate();
+        console.log('Conexión a la base de datos establecida correctamente.');
+    } catch (error) {
+        console.error('No se pudo conectar a la base de datos:', error);
+    }
+}
+
+// Llama a la función para probar la conexión
+testConnection();

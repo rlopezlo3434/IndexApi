@@ -50,7 +50,7 @@ const User = sequelize.define('User', {
     },
   },
   asesor: {
-    type: DataTypes.INTEGER, // Tipo de dato, puedes usar BIGINT si es necesario
+    type: DataTypes.BIGINT, // Tipo de dato, puedes usar BIGINT si es necesario
     allowNull: true, // Permite valores nulos
     defaultValue: 0, // Valor por defecto
   },
@@ -76,5 +76,7 @@ const User = sequelize.define('User', {
 // Definir la relación con el modelo Role si es necesario
 User.belongsTo(Role, { foreignKey: 'rol_id', as: 'role' });
 User.hasOne(User, { as: 'asesorData', foreignKey: 'id', sourceKey: 'asesor' });
+// Definir la relación autorreferencial para el campo `asesor`
+// User.belongsTo(User, { as: 'asesorData', foreignKey: 'asesor', targetKey: 'id' });
 
 module.exports = User;
