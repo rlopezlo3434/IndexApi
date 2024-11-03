@@ -8,7 +8,11 @@ class AuthController {
       const user = await AuthService.authenticateUser(email, password);
       if (user) {
         const token = AuthService.generateToken(user);
-        res.cookie('token', token); // Almacena el token en una cookie segura
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: true,        // Asegúrate de que está habilitado para HTTPS
+          sameSite: 'None'     // Permite que la cookie sea accesible en dominios cruzados
+        });
         res.status(200).json({ message: 'Inicio de sesión exitoso', user: user});
       } else {
         res.status(401).json({ message: 'Credenciales inválidas' });
