@@ -129,6 +129,7 @@ const PerfilInversion = require('./PerfilInversion'); // Modelo de PerfilInversi
 const Empresa = require('./Empresa'); // Modelo de Empresa
 const User = require('./User'); // Modelo de User
 
+console.log(User, "User Inversion")
 Inversion.belongsTo(User, {
   foreignKey: {
     name: 'user_id',

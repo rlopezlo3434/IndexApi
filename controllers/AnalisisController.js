@@ -2,6 +2,28 @@ const AnalisisService = require('../services/AnalisisService');
 
 class AnalisisController {
 
+    static async getUsersWithInvestments(req, res) {
+        try {
+            // Llama al servicio que obtiene los datos
+            const usersWithInvestments = await AnalisisService.obtenerUsuariosConInversiones();
+            
+            // Devuelve la respuesta en formato JSON
+            return res.status(200).json({
+                success: true,
+                data: usersWithInvestments
+            });
+        } catch (error) {
+            console.error('Error en getUsersWithInvestments:', error);
+
+            // En caso de error, envía un código 500 con el mensaje de error
+            return res.status(500).json({
+                success: false,
+                message: 'Error al obtener usuarios con sus inversiones',
+                error: error.message
+            });
+        }
+    }
+
     static async getMontosPorEmpresa(req, res) {
         try {
             const montos = await AnalisisService.getTotalsByEmpresa();

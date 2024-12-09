@@ -22,9 +22,9 @@ class AuthController {
   //   }
   // }
   static async login(req, res) {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
     try {
-      const user = await AuthService.authenticateUser(email, password);
+      const user = await AuthService.authenticateUser(email, password, role);
       if (user) {
         const token = AuthService.generateToken(user);
         // Enviar el token en la respuesta JSON

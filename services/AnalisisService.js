@@ -53,6 +53,26 @@ class AnalisisService {
         }
     }
 
+    static async obtenerUsuariosConInversiones() {
+        try {
+          const usuarios = await User.findAll({
+            include: [
+              {
+                model: Inversion,
+                as: 'user', // Este debe coincidir con el alias en el modelo `Inversion`
+                foreignKey: 'user_id', // Especifica la clave foránea manualmente
+              },
+            ],
+            order: [['nombre', 'ASC'], ['inversiones', 'fecha_inicio', 'ASC']],
+          });
+      
+          return usuarios;
+        } catch (error) {
+          console.error('Error al obtener usuarios con inversiones:', error);
+          throw error;
+        }
+      };
+
     static async contarInversionesPorVencer() {
         const fechaInicio = new Date();
         fechaInicio.setMonth(fechaInicio.getMonth() + 1);

@@ -8,6 +8,7 @@ const cors = require('cors');
 const Role = require('./models/Role');
 const User = require('./models/User');
 const Invsersion = require('./models/Inversion');
+const HistoricoAsesor = require('./models/HistoricoAsesor');
 
 // Importación de rutas
 const userRoutes = require('./routes/userRoutes');
@@ -15,7 +16,8 @@ const authRoutes = require('./routes/authRoutes');
 const registerRoutes = require('./routes/registerRoutes');
 const clienteRoutes = require('./routes/clienteRoutes');
 const analisisRoutes = require('./routes/analisisRoutes');
-
+const historicoAsesorRoutes = require('./routes/historicoRoutes');
+const empresaRoutes = require('./routes/empresaRoutes');
 // Configuración de Sequelize
 const sequelize = require('./config/database');
 
@@ -40,6 +42,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api', registerRoutes);
 app.use('/api', clienteRoutes);
 app.use('/api', analisisRoutes);
+app.use('/api', historicoAsesorRoutes);
+app.use('/api', empresaRoutes);
 
 // Middleware para el manejo de errores generales
 app.use((err, req, res, next) => {
@@ -56,10 +60,11 @@ app.listen(PORT, async () => {
 
   // Sincronización con la base de datos
   try {
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ alter: false });
     await Role.sync();   // Sincroniza la tabla Role primero
     await Invsersion.sync();   // Sincroniza la tabla Inversion después
     await User.sync();   // Sincroniza la tabla User después
+    await HistoricoAsesor.sync();   // Sincroniza la tabla Historico
     console.log('Base de datos sincronizada correctamente');
   } catch (error) {
     console.error('Error al sincronizar la base de datos:', error);

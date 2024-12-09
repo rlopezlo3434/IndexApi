@@ -10,4 +10,12 @@ router.post('/registrarInversion', RegistroController.registerInversion);
 
 router.post('/registrarAsesor', RegistroController.registerAsesor);
 
+router.post('/actualizarPass', RegistroController.updatePassword);
+
+router.post('/actualizarEstado', RegistroController.updateEstado);
+
+router.post('/actualizarDocumento', RegistroController.updateDocumento);
+
+
+
 module.exports = router;

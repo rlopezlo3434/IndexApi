@@ -11,6 +11,53 @@ const transporter = nodemailer.createTransport({
 
 class RegistroController {
 
+  static async updatePassword(req, res) {
+    const { userId, password } = req.body.params;
+  
+    try {
+      // Llamar al método que actualiza la contraseña
+      const result = await RegistroService.updatePasswordById(userId, password);
+  
+      // Responder con éxito
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('Error al actualizar la contraseña:', error);
+      res.status(500).json({ message: 'Error al actualizar la contraseña', error });
+    }
+  }
+
+  static async updateEstado(req, res) {
+    const { id, estado } = req.body.params;
+  
+    try {
+      // Llamar al método que actualiza la contraseña
+      const result = await RegistroService.updateEstadoById(id, estado);
+  
+      // Responder con éxito
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('Error al actualizar la inversion:', error);
+      res.status(500).json({ message: 'Error al actualizar la inversion', error });
+    }
+  }
+
+  static async updateDocumento(req, res) {
+    const { id, documento, nombre_documento, tipo_documento } = req.body.params;
+  
+    try {
+      // Llamar al método que actualiza la contraseña
+      const result = await RegistroService.updateDocumentoByID(id, documento, nombre_documento, tipo_documento);
+  
+      // Responder con éxito
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('Error al actualizar la inversion:', error);
+      res.status(500).json({ message: 'Error al actualizar la inversion', error });
+    }
+  }
+
+  
+
   static generarContraseña() {
     const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let contraseña = '';

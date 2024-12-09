@@ -4,11 +4,11 @@ const Inversion = require('../models/Inversion'); // Modelo de Inversion
 
 class ClienteService {
 
-    static async getClientesAsesor(fechaInicioDesde, fechaInicioHasta, fechaVencInicio, fechaVencHasta, moneda, empresa, asesor) {
+    static async getClientesAsesor(fechaInicioDesde, fechaInicioHasta, fechaVencInicio, fechaVencHasta, moneda, empresa, asesor, estado) {
         try {
             // Filtros que se aplican
             const filtros = {};
-    
+
             // Filtrar por rango de fecha de inicio
             if (fechaInicioDesde && fechaInicioHasta) {
                 filtros.fecha_inicio = {
@@ -16,7 +16,7 @@ class ClienteService {
                     [Op.lte]: new Date(fechaInicioHasta)
                 };
             }
-    
+
             // Filtrar por rango de fecha de vencimiento
             if (fechaVencInicio && fechaVencHasta) {
                 filtros.fecha_vencimiento = {
@@ -24,14 +24,19 @@ class ClienteService {
                     [Op.lte]: new Date(fechaVencHasta)
                 };
             }
-    
+
+            // Filtrar por estado si está definido
+            if (estado && estado !== "Seleccione...") {
+                filtros.estado = estado; // Filtra por el estado exacto
+            }
+
             // Filtrar por empresa si está definido
-            if (empresa) {
+            if (empresa  && empresa !== "Seleccione...") {
                 filtros.empresa = empresa;
             }
-    
+
             console.log(filtros, asesor);
-    
+
             // Búsqueda con agrupación y agregaciones
             const inversiones = await Inversion.findAll({
                 attributes: [
@@ -54,17 +59,148 @@ class ClienteService {
                 }],
                 where: filtros,
                 group: [
-                    'user_id', 
-                    'user.nombre', 
-                    'user.apellido', 
-                    'user.email' 
+                    'user_id',
+                    'user.nombre',
+                    'user.apellido',
+                    'user.email'
                 ] // No agregamos estado aquí
             });
-    
+
             return inversiones;
         } catch (error) {
             console.error('Error al obtener clientes por asesor:', error);
             throw new Error('Error al obtener clientes.');
+        }
+    }
+
+    static async getInversionesAgrupadasPorUsuarios() {
+        try {
+            // Obtener todas las inversiones con información del usuario y el asesor
+            const inversiones = await Inversion.findAll({
+                include: [
+                    {
+                        model: User,
+                        as: 'user',
+                        attributes: ['nombre', 'apellido', 'email', 'id', 'asesor', 'dni', 'phone', 'fecha_nacimiento'],
+                        include: [
+                            {
+                                model: User,
+                                as: 'asesorData',
+                                attributes: ['nombre', 'apellido', 'email', 'id']
+                            }
+                        ]
+                    }
+                ],
+                order: [['user_id', 'ASC'], ['fecha_inicio', 'ASC']] // Ordenar por usuario e inversión
+            });
+
+            // Agrupar las inversiones por usuario
+            const inversionesAgrupadas = [];
+
+            let currentUser = null;
+            let currentUserInversiones = [];
+
+            for (const inv of inversiones) {
+                if (!currentUser || currentUser.id !== inv.user.id) {
+                    // Si el usuario cambia, guardamos las inversiones del usuario anterior
+                    if (currentUser) {
+                        inversionesAgrupadas.push({
+
+                            nombre: currentUser.nombre,
+                            apellido: currentUser.apellido,
+                            email: currentUser.email,
+                            dni: currentUser.dni,
+                            phone: currentUser.phone,
+                            fecha_nacimiento: currentUser.fecha_nacimiento,
+                            inversiones: currentUserInversiones
+
+                        });
+                    }
+
+                    // Actualizamos el usuario actual
+                    currentUser = inv.user;
+                    currentUserInversiones = [];
+                }
+
+                // Agregar la inversión al usuario actual
+                currentUserInversiones.push({
+                    id: inv.id,
+                    fecha_inicio: inv.fecha_inicio,
+                    fecha_vencimiento: inv.fecha_vencimiento,
+                    monto_soles: inv.monto_soles,
+                    monto_dolares: inv.monto_dolares,
+                    fondo: inv.fondo,
+                    rentabilidad: inv.rentabilidad,
+                    objetivo: inv.objetivo,
+                    frecuencia: inv.frecuencia,
+                    empresa: inv.empresa,
+                    estado: inv.estado,
+                    tipoInversion: inv.tipoInversion,
+                    perfilInversion: inv.perfilInversion,
+                    nombre2: inv.nombre2,
+                    apellido2: inv.apellido2,
+                    dni2: inv.dni2,
+                    email2: inv.email2,
+                    phone2: inv.phone2,
+                    fecha_nacimiento2: inv.fecha_nacimiento2,
+                    nombre3: inv.nombre3,
+                    apellido3: inv.apellido3,
+                    dni3: inv.dni3,
+                    email3: inv.email3,
+                    phone3: inv.phone3,
+                    fecha_nacimiento3: inv.fecha_nacimiento3,
+                    update: inv.updatedAt
+
+                });
+            }
+
+            // Agregar las inversiones del último usuario
+            if (currentUser) {
+                inversionesAgrupadas.push({
+
+                    nombre: currentUser.nombre,
+                    apellido: currentUser.apellido,
+                    email: currentUser.email,
+                    dni: currentUser.dni,
+                    phone: currentUser.phone,
+                    fecha_nacimiento: currentUser.fecha_nacimiento,
+                    inversiones: inversiones.map(inv => ({
+                        id: inv.id,
+                        fecha_inicio: inv.fecha_inicio,
+                        fecha_vencimiento: inv.fecha_vencimiento,
+                        monto_soles: inv.monto_soles,
+                        monto_dolares: inv.monto_dolares,
+                        fondo: inv.fondo,
+                        rentabilidad: inv.rentabilidad,
+                        objetivo: inv.objetivo,
+                        frecuencia: inv.frecuencia,
+                        empresa: inv.empresa,
+                        estado: inv.estado,
+                        tipoInversion: inv.tipoInversion,
+                        perfilInversion: inv.perfilInversion,
+                        nombre2: inv.nombre2,
+                        apellido2: inv.apellido2,
+                        dni2: inv.dni2,
+                        email2: inv.email2,
+                        phone2: inv.phone2,
+                        fecha_nacimiento2: inv.fecha_nacimiento2,
+                        nombre3: inv.nombre3,
+                        apellido3: inv.apellido3,
+                        dni3: inv.dni3,
+                        email3: inv.email3,
+                        phone3: inv.phone3,
+                        fecha_nacimiento3: inv.fecha_nacimiento3,
+                        update: inv.updatedAt
+                    }))
+
+                });
+            }
+
+            return inversionesAgrupadas;
+
+        } catch (error) {
+            console.error('Error al obtener inversiones por usuarios:', error);
+            throw new Error('Error al obtener inversiones de los usuarios.');
         }
     }
 
@@ -73,7 +209,7 @@ class ClienteService {
             if (!userId) {
                 throw new Error('El ID de usuario es requerido.');
             }
-    
+
             // Buscar todas las inversiones del usuario específico
             const inversiones = await Inversion.findAll({
                 where: { user_id: userId },
@@ -81,7 +217,7 @@ class ClienteService {
                     {
                         model: User,
                         as: 'user',
-                        attributes: ['nombre', 'apellido', 'email', 'id', 'asesor',  'dni','phone','fecha_nacimiento'], // Información básica del usuario
+                        attributes: ['nombre', 'apellido', 'email', 'id', 'asesor', 'dni', 'phone', 'fecha_nacimiento'], // Información básica del usuario
                         include: [
                             {
                                 model: User,
@@ -93,7 +229,7 @@ class ClienteService {
                 ],
                 order: [['fecha_inicio', 'ASC']]
             });
-    
+
             // Agrupar las inversiones bajo la clave "cliente"
             const inversionesAgrupadas = {
                 cliente: {
@@ -143,9 +279,9 @@ class ClienteService {
                     }))
                 }
             };
-    
+
             return inversionesAgrupadas;
-    
+
         } catch (error) {
             console.error('Error al obtener inversiones por usuario:', error);
             throw new Error('Error al obtener inversiones del usuario.');

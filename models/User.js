@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Role = require('./Role'); // Asegúrate de importar el modelo Role si hay una relación
+const HistoricoAsesor = require('./HistoricoAsesor'); // Asegúrate de importar el modelo HistoricoAsesor si hay una relación
 
 const User = sequelize.define('User', {
   id: {
@@ -76,7 +77,7 @@ const User = sequelize.define('User', {
 // Definir la relación con el modelo Role si es necesario
 User.belongsTo(Role, { foreignKey: 'rol_id', as: 'role' });
 User.hasOne(User, { as: 'asesorData', foreignKey: 'id', sourceKey: 'asesor' });
-// Definir la relación autorreferencial para el campo `asesor`
-// User.belongsTo(User, { as: 'asesorData', foreignKey: 'asesor', targetKey: 'id' });
+// User.hasMany(HistoricoAsesor, { foreignKey: 'user_id', as: 'historicoAsesor' });
+
 
 module.exports = User;

@@ -4,9 +4,9 @@ class ClienteController {
 
     static async getClientesAsesor(req, res) {
         console.log(req.body);
-        const { fechaInicioDesde, fechaInicioHasta, fechaVencInicio, fechaVencHasta, moneda, empresa, asesor } = req.body.params; // Obtener el asesor del cuerpo de la solicitud
+        const { fechaInicioDesde, fechaInicioHasta, fechaVencInicio, fechaVencHasta, moneda, empresa, asesor, estado } = req.body.params; // Obtener el asesor del cuerpo de la solicitud
         try{
-            const clientes = await ClienteService.getClientesAsesor(fechaInicioDesde, fechaInicioHasta, fechaVencInicio, fechaVencHasta, moneda, empresa,asesor);
+            const clientes = await ClienteService.getClientesAsesor(fechaInicioDesde, fechaInicioHasta, fechaVencInicio, fechaVencHasta, moneda, empresa,asesor, estado);
             return res.status(200).json(clientes);
         }
         catch (error) {
@@ -20,6 +20,19 @@ class ClienteController {
             const cliente = await ClienteService.getInversionesAgrupadasPorUsuario(id);
             return res.status(200).json(cliente);
         } catch (error) {
+            return res.status(500).json({ message: error.message });
+        }
+    }
+
+    static async getClientes(req, res) {
+        try {
+            // Obtener todas las inversiones agrupadas por usuarios
+            const clientes = await ClienteService.getInversionesAgrupadasPorUsuarios();
+    
+            // Devolver las inversiones agrupadas por usuario
+            return res.status(200).json(clientes);
+        } catch (error) {
+            // Si hay un error, responder con código 500 y mensaje de error
             return res.status(500).json({ message: error.message });
         }
     }
