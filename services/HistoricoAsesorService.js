@@ -10,6 +10,7 @@ class HistoricoAsesorService {
         INSERT INTO historico_asesores (user_id, texto)
         VALUES (:userId, :texto)
       `;
+      //holasasd
       
       // Ejecutar la consulta con parámetros
       await sequelize.query(query, {
